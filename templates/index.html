@@ -12,7 +12,7 @@
       margin: 0;
       overflow: hidden;
       font-family: "PingFang TC", "Noto Sans TC", "Helvetica Neue", Helvetica, Arial, sans-serif;
-      text-align: center; /* 保底設定 */
+      text-align: center;
     }
 
     #overlay {
@@ -21,14 +21,14 @@
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
-      max-width: 90vw; /* ✅ 最重要，限制最大寬度，不讓文字跑出去 */
+      max-width: 90vw;
       height: 100%;
       display: none;
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 0 5vw; /* ✅ 左右留安全距，稍微縮小以避免擠壓 */
-      word-break: break-word; /* 長字自動斷行 */
+      padding: 0 5vw;
+      word-break: break-word;
       z-index: 9999;
       flex-direction: column;
       font-size: 5vw;
@@ -38,7 +38,7 @@
     @media (min-width: 768px) {
       #overlay {
         font-size: 32px;
-        max-width: 70vw; /* 桌面版再更收斂一些，留更大的邊 */
+        max-width: 70vw;
       }
     }
 
@@ -46,6 +46,24 @@
       #overlay {
         font-size: 20px;
       }
+    }
+
+    #chat {
+      max-height: 80vh;
+      overflow-y: auto;
+      padding-bottom: 80px; /* 保留空間避免被輸入框蓋住 */
+    }
+
+    #inputForm {
+      position: fixed;
+      bottom: 10vh;
+      width: 90%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      justify-content: center;
+      z-index: 1000;
+      background-color: black;
     }
 
     @keyframes flicker {
@@ -64,7 +82,7 @@
     .fadeInOut {
       animation: fadeInOut 6s forwards;
     }
-</style>
+  </style>
 </head>
 <body>
   <h1 id="title" style="text-align: center; margin-top: 10px;">向神靈祈願</h1>
@@ -120,7 +138,6 @@ inputForm.addEventListener('submit', async (e) => {
   addMessage(`祈願者：${text}`, 'user');
   userInput.value = '';
 
-  // --- 神靈傳信中 ---
   const listeningMessage = document.createElement('div');
   listeningMessage.classList.add('message', 'bot');
   listeningMessage.innerHTML = `🧿: 神靈傾聽中<span id="dots">.</span>`;
