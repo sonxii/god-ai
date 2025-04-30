@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>神靈回應牆</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: black;
+      margin: 0;
+      overflow: hidden;
+      position: relative;
+      height: 100vh;
+      width: 100vw;
+      font-family: "PingFang TC", "Noto Sans TC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .reply {
+      position: absolute;
+      color: white;
+      opacity: 0;
+      filter: blur(8px);
+      animation: appearAndFall 6s ease forwards;
+      white-space: pre-wrap;
+      word-break: break-word;
+      text-shadow: 0 0 10px rgba(255,255,255,0.8);
+    }
+
+    @keyframes appearAndFall {
+      0% {
+        transform: translateY(-10%);
+        opacity: 0;
+        filter: blur(8px);
+      }
+      10% {
+        opacity: 0.8;
+        filter: blur(6px);
+      }
+      20% {
+        opacity: 0.5;
+        filter: blur(4px);
+      }
+      40% {
+        opacity: 1;
+        filter: blur(2px);
+      }
+      50% {
+        opacity: 0.7; /* 輕微閃爍 */
+      }
+      60% {
+        opacity: 1;
+      }
+      80% {
+        transform: translateY(90%);
+        opacity: 1;
+        filter: blur(0px);
+      }
+      100% {
+        transform: translateY(100%);
+        opacity: 1;
+        filter: blur(0px);
+      }
+    }
+
+    #finalOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      color: white;
+      font-size: 3vw;
+      text-align: center;
+      padding: 20vh 10vw;
+      z-index: 9999;
+      animation: fadeIn 2s forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="finalOverlay">祈願者，你所敬拜的神，是自然的形狀，還是你慾望的倒影？</div>
+
+  <script>
+    const finalOverlay = document.getElementById('finalOverlay');
+    let flashingInterval = null;
+
+    const evtSource = new EventSource('/stream');
+    evtSource.onmessage = function(e) {
+      try {
+        const data = JSON.parse(e.data);
+
+        if (data.stage === 'final') {
+          triggerFinalSequence();
+          return;
+        }
+
+        const latestReply = data.replies[data.replies.length - 1];
+        if (latestReply) {
+          createFallingText(latestReply);
+        }
+
+      } catch (err) {
+        console.error('資料解析錯誤:', err);
+      }
+    };
+
+    function createFallingText(text) {
+      const div = document.createElement('div');
+      div.classList.add('reply');
+      div.innerText = text;
+
+      // 隨機字體大小
+      const fontSize = Math.random() * 2 + 1; // 1vw ~ 3vw
+      div.style.fontSize = fontSize + 'vw';
+
+      // 隨機水平位置
+      const left = Math.random() * 80 + 10; // 10% ~ 90%
+      div.style.left = left + '%';
+
+      document.body.appendChild(div);
+    }
+
+    function triggerFinalSequence() {
+      // 清空畫面
+      document.body.innerHTML = '';
+
+      // 黑白閃屏效果
+      let flash = false;
+      flashingInterval = setInterval(() => {
+        document.body.style.backgroundColor = flash ? 'white' : 'black';
+        flash = !flash;
+      }, 120);
+
+      setTimeout(() => {
+        clearInterval(flashingInterval);
+        document.body.style.backgroundColor = 'black';
+        document.body.appendChild(finalOverlay);
+        finalOverlay.style.display = 'block';
+      }, 8000);
+    }
+  </script>
+</body>
+</html>
