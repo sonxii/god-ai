@@ -1,0 +1,36 @@
+﻿# Python 編譯
+__pycache__/
+*.py[cod]
+*.pyo
+
+# 虛擬環境
+venv/
+env/
+.venv/
+
+# 編譯結果
+*.log
+*.pot
+*.pyc
+
+# 系統
+.DS_Store
+Thumbs.db
+
+# Render / 部署
+instance/
+.webassets-cache
+*.sqlite3
+*.db
+
+# 忽略其他靜態資源中的中繼或大檔案，但保留字型 JSON
+static/fonts/*
+!static/fonts/*.json
+
+# 忽略 env 檔案
+.env
+.env.*
+
+# VSCode 或其他 IDE 設定
+.vscode/
+.idea/
