@@ -9,17 +9,80 @@
       margin: 0;
       background-color: black;
       overflow: hidden;
+      font-family: sans-serif;
     }
-    canvas {
-      display: block;
+    #three-container {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+    }
+    #instructions {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 1rem;
+      font-family: "PingFang TC", "Noto Sans TC", sans-serif;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
-  <script src="/static/particles/three.min.js"></script>
-  <script src="/static/particles/Font.js"></script>        <!-- 要加上這行 -->
-  <script src="/static/particles/FontLoader.js"></script>
-  <script src="/static/particles/TextGeometry.js"></script>
-  <script src="/static/particles/script.js"></script>
+  <div id="three-container"></div>
+  <div id="instructions">click and drag to control the animation</div>
+
+  <!-- three.js 與相關工具庫 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.min.js"></script>
+  <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/175711/bas.js"></script>
+  <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/175711/TextGeometry.js"></script>
+  <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/175711/FontUtils.js"></script>
+  <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/175711/pnltri.min.js"></script>
+  <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/175711/droid_sans_bold.typeface.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.0/TweenMax.min.js"></script>
+
+  <script>
+    let scene, camera, renderer, mesh;
+    const container = document.getElementById('three-container');
+
+    init();
+    animate();
+
+    function init() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+      camera.position.z = 500;
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      container.appendChild(renderer.domElement);
+
+      const textGeo = new THREE.TextGeometry("神靈現身", {
+        size: 80,
+        height: 5,
+        curveSegments: 4,
+        font: 'droid sans',
+        weight: 'bold'
+      });
+
+      const material = new THREE.PointsMaterial({ color: 0xffffff, size: 2 });
+      mesh = new THREE.Points(textGeo, material);
+      scene.add(mesh);
+
+      window.addEventListener('resize', onWindowResize, false);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      mesh.rotation.y += 0.01;
+      renderer.render(scene, camera);
+    }
+  </script>
 </body>
 </html>
