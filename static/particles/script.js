@@ -1,11 +1,13 @@
-let scene, camera, renderer, font, currentTextMesh;
+let scene, camera, renderer, font;
+let textPointsList = [];
+const maxTextCount = 5;
 
 init();
 
 function init() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
-  camera.position.z = 800;
+  camera.position.z = 100;
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -13,50 +15,66 @@ function init() {
 
   const loader = new THREE.FontLoader();
   loader.load('/static/fonts/NotoSansTC-Light2.json', loadedFont => {
-    console.log("✅ 字型載入成功");
     font = loadedFont;
-    displayText("測試粒子訊息"); // 初始測試用，可替換為 GPT 回應
+    updateText("神靈顯現中...");
+    connectToStream();
   });
 
   animate();
 }
 
-function displayText(text) {
-  if (currentTextMesh) scene.remove(currentTextMesh);
+function updateText(content) {
+  if (!font) return;
 
-  const geometry = new THREE.TextGeometry(text, {
+  const textGeo = new THREE.TextGeometry(content, {
     font: font,
-    size: 60,
-    height: 1,
-    curveSegments: 12,
-  });
-  geometry.center();
-
-  const material = new THREE.PointsMaterial({
-    color: 0xffffff,
-    size: 2,
+    size: 10,
+    height: 0.1,
+    curveSegments: 2,
+    bevelEnabled: false
   });
 
-  const points = new THREE.Points(geometry, material);
-  points.material.transparent = true;
-  points.material.opacity = 0.0;
+  textGeo.computeBoundingBox();
+  textGeo.computeVertexNormals();
+  textGeo.center();
 
+  textGeo.vertices.forEach(v => {
+    v.startPoint = v.clone();
+    v.direction = v.clone().normalize();
+  });
+
+  const material = new THREE.PointsMaterial({ color: 0x00ffcc, size: 0.5 });
+  const points = new THREE.Points(textGeo, material);
+
+  if (textPointsList.length >= maxTextCount) {
+    const removed = textPointsList.shift();
+    scene.remove(removed);
+  }
+
+  textPointsList.push(points);
   scene.add(points);
-  currentTextMesh = points;
-
-  // 動畫：從模糊到清晰（用 opacity 緩慢浮現）
-  let opacity = 0.0;
-  const fadeIn = setInterval(() => {
-    opacity += 0.04;
-    if (opacity >= 1.0) {
-      opacity = 1.0;
-      clearInterval(fadeIn);
-    }
-    points.material.opacity = opacity;
-  }, 50);
 }
 
 function animate() {
   requestAnimationFrame(animate);
+  const time = Date.now() * 0.001;
+
+  textPointsList.forEach(textPoints => {
+    if (textPoints.geometry && textPoints.geometry.vertices) {
+      textPoints.geometry.vertices.forEach(v => {
+        v.copy(v.startPoint).addScaledVector(v.direction, 5 + Math.sin(time) * 5);
+      });
+      textPoints.geometry.verticesNeedUpdate = true;
+    }
+  });
+
   renderer.render(scene, camera);
+}
+
+function connectToStream() {
+  const eventSource = new EventSource('/stream');
+  eventSource.onmessage = function (event) {
+    const msg = event.data.trim();
+    if (msg) updateText(msg);
+  };
 }
