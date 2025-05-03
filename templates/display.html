@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>神靈顯現</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    html, body {
+    body {
       margin: 0;
-      background-color: black;
       overflow: hidden;
+      background-color: black;
     }
     canvas {
       display: block;
@@ -16,85 +16,10 @@
   </style>
 </head>
 <body>
-  <div id="three-container"></div>
-  <script id="vs" type="x-shader/x-vertex">
-    attribute vec3 a_text_pos_1;
-    attribute vec3 a_text_pos_2;
-    attribute vec3 a_randoms;
-
-    varying vec3 v_pos;
-    varying float v_alpha;
-    varying float v_intensity;
-    varying vec3 v_rgb_noise;
-
-    uniform float u_level;
-    uniform float u_time;
-    uniform float u_noise;
-    uniform float u_max_particle_size;
-    uniform vec2 u_text_offset_1;
-    uniform vec2 u_text_offset_2;
-
-    float clampNorm(float val, float min, float max) {
-      return clamp((val - min) / (max - min), 0.0, 1.0);
-    }
-
-    float easeOutBack(float t) {
-      const float s = 1.70158;
-      return (t -= 1.0) * t * ((s + 1.0) * t + s) + 1.0;
-    }
-
-    float rand(vec2 co){
-      return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
-    }
-
-    void main(void) {
-      vec3 pos = position;
-      float randValue = rand(a_randoms.xx);
-      float ratio = easeOutBack(smoothstep(randValue * 0.3, 0.7 + randValue * 0.3, u_level));
-
-      vec3 textInfo = mix(
-          a_text_pos_1 + vec3(u_text_offset_1, 0.0),
-          a_text_pos_2 + vec3(u_text_offset_2, 0.0),
-          ratio
-      );
-
-      float noiseRatio = 1.0 - abs(ratio - 0.5) * 2.0;
-      pos.x = textInfo.x + 0.5;
-      pos.y = -textInfo.y + 0.5;
-      pos.z = 0.0;
-      v_alpha = mix(textInfo.z, (textInfo.z + 0.3) * noiseRatio, noiseRatio);
-      v_intensity = noiseRatio * randValue * 4.0;
-      gl_PointSize = 2.0 + noiseRatio * u_max_particle_size * pow(randValue, 4.0);
-      v_rgb_noise = vec3(
-        noiseRatio * fract(randValue * 7542.0) * 0.1,
-        noiseRatio * fract(randValue * 5324.0) * 0.05,
-        0.0
-      );
-      gl_Position =  projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-    }
-  </script>
-
-  <script id="fs" type="x-shader/x-fragment">
-    precision highp float;
-
-    varying float v_alpha;
-    varying float v_intensity;
-    varying vec3 v_rgb_noise;
-
-    void main(void) {
-      float len = length(gl_PointCoord.xy - .5) * 2.0;
-      float c = pow(clamp(1.0 - len, 0.0, 1.0), 2.0 + v_intensity);
-      gl_FragColor = vec4(c - v_rgb_noise.r, c - v_rgb_noise.g, c - v_rgb_noise.b, v_alpha);
-    }
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
-  <script>
-    // 後續這裡會補齊：
-    // - 初始化 scene/camera/renderer
-    // - 建立 buffer geometry 並載入每個句子點位
-    // - 保留最近 5 則神靈回應，在每次有新回應時重新整理動畫隊列
-    // - 輪播顯示 + 粒子過渡動畫（用 u_level 時間推進）
-  </script>
+  <script src="/static/particles/three.min.js"></script>
+  <script src="/static/particles/FontLoader.js"></script>
+  <script src="/static/particles/TextGeometry.js"></script>
+  <script src="/static/particles/Font.js"></script>
+  <script src="/static/particles/script.js"></script>
 </body>
 </html>
