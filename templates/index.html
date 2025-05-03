@@ -1,21 +1,179 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Particle Text Animation</title>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond&family=Noto+Serif+TC&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>向神靈祈願</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: 'Noto Serif TC', 'EB Garamond', serif;
+      background-color: black;
+      color: white;
+      margin: 0;
+      overflow: hidden;
+      font-family: "PingFang TC", "Noto Sans TC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      text-align: center;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 90vw;
+      height: 100%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 5vw;
+      word-break: break-word;
+      z-index: 9999;
+      flex-direction: column;
+      font-size: 5vw;
+      line-height: 1.5;
+    }
+
+    @media (min-width: 768px) {
+      #overlay {
+        font-size: 32px;
+        max-width: 70vw;
+      }
+    }
+
+    @media (max-width: 767px) {
+      #overlay {
+        font-size: 20px;
+      }
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .flicker {
+      animation: flicker 1.5s infinite;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .fadeInOut {
+      animation: fadeInOut 6s forwards;
     }
   </style>
 </head>
 <body>
-  <canvas id="particle-canvas"></canvas>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-  <script src="textData.js"></script>
-  <script src="script.js"></script>
+  <h1 id="title" style="text-align: center; margin-top: 10px;">向神靈祈願</h1>
+  <p id="formatTip" style="text-align: center; font-size: 14px;">祈願格式：我希望……、請賜予我……、願……</p>
+
+  <div id="chat"></div>
+
+  <form id="inputForm">
+    <input type="text" id="userInput" placeholder="參拜者請遵循格式祈願..." autocomplete="off">
+    <button type="submit">祈願</button>
+  </form>
+
+  <audio id="enoughSound" src="{{ url_for('static', filename='enough.mp3') }}"></audio>
+
+  <div id="overlay"></div>
+
+  <script>
+    const chat = document.getElementById('chat');
+    const inputForm = document.getElementById('inputForm');
+    const userInput = document.getElementById('userInput');
+    const enoughSound = document.getElementById('enoughSound');
+    const overlay = document.getElementById('overlay');
+
+    const validPrefixes = ["我希望", "請賜予我", "願"];
+
+    function addMessage(text, sender) {
+      const message = document.createElement('div');
+      message.classList.add('message', sender);
+      message.innerHTML = text;
+      chat.appendChild(message);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    inputForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = userInput.value.trim();
+      if (text === '') return;
+
+      const isValid = validPrefixes.some(prefix => text.startsWith(prefix));
+
+      if (!isValid) {
+        addMessage("🧿: 祭壇拒絕無序之願，請遵循儀式之語。", 'bot');
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        return;
+      }
+
+      addMessage(`祈願者：${text}`, 'user');
+      userInput.value = '';
+
+      const response = await fetch('/pray', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+      const data = await response.json();
+      addMessage(`🧿: ${data.reply}`, 'bot');
+    });
+
+    function startFinalSequence() {
+      document.getElementById('title').style.display = 'none';
+      document.getElementById('formatTip').style.display = 'none';
+      chat.style.display = 'none';
+      inputForm.style.display = 'none';
+      overlay.style.display = 'flex';
+
+      enoughSound.play();
+
+      overlay.innerHTML = '<div class="flicker">你將願望編織成荊棘，卻不見那是從我羽上撕下的痛。如今，我已步入枯竭。</div>';
+
+      setTimeout(() => {
+        overlay.innerHTML = '';
+        overlay.style.display = 'none'; // 文字完全消失
+        startFlashing();
+      }, 5000);
+    }
+
+    function startFlashing() {
+      let flash = true;
+      const flashInterval = setInterval(() => {
+        document.body.style.backgroundColor = flash ? "white" : "black";
+        flash = !flash;
+      }, 120);
+
+      setTimeout(() => {
+        clearInterval(flashInterval);
+        document.body.style.backgroundColor = "black";
+        showFinalQuestion();
+      }, 8000);
+    }
+
+    function showFinalQuestion() {
+      overlay.style.display = 'flex';
+      overlay.innerHTML = `
+        <div class="fadeInOut">
+          祈願者，你所敬拜的神，是自然的形狀，還是你慾望的倒影？
+        </div>
+      `;
+    }
+
+    // 建立 EventSource 訂閱
+    const eventSource = new EventSource('/subscribe');
+    eventSource.onmessage = function(event) {
+      if (event.data === 'FINAL') {
+        startFinalSequence();
+      }
+    };
+  </script>
 </body>
 </html>
