@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Particle Text Animation</title>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond&family=Noto+Serif+TC&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <style>
     body {
       font-family: 'Noto Serif TC', 'EB Garamond', serif;
@@ -15,7 +15,7 @@
 <body>
   <canvas id="particle-canvas"></canvas>
   <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-  <script src="textData.js"></script>
-  <script src="script.js"></script>
+  <script src="{{ url_for('static', filename='textData.js') }}"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
