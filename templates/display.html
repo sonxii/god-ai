@@ -1,25 +1,21 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>神靈顯現</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Particle Text Animation</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond&family=Noto+Serif+TC&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
   <style>
     body {
-      margin: 0;
-      overflow: hidden;
-      background-color: black;
-    }
-    canvas {
-      display: block;
+      font-family: 'Noto Serif TC', 'EB Garamond', serif;
     }
   </style>
 </head>
 <body>
-  <script src="/static/particles/three.min.js"></script>
-  <script src="/static/particles/FontLoader.js"></script>
-  <script src="/static/particles/TextGeometry.js"></script>
-  <script src="/static/particles/Font.js"></script>
-  <script src="/static/particles/script.js"></script>
+  <canvas id="particle-canvas"></canvas>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+  <script src="textData.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
