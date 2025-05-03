@@ -12,7 +12,7 @@ function init() {
   document.body.appendChild(renderer.domElement);
 
   const loader = new THREE.FontLoader();
-  loader.load('/static/fonts/NotoSansTC-Light.typeface.json', loadedFont => {
+  loader.load('/static/fonts/NotoSansTC-Light.json', loadedFont => {
     font = loadedFont;
     displayText("測試粒子訊息"); // 初始測試用，可替換為 GPT 回應
   });
