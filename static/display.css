@@ -1,8 +1,24 @@
-body {
-  margin: 0;
-  background: black;
-  overflow: hidden;
-}
-canvas {
-  display: block;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deity Particle Display</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond&family=Noto+Serif+TC&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='display.css') }}">
+  <style>
+    body {
+      font-family: 'Noto Serif TC', 'EB Garamond', serif;
+      margin: 0;
+      overflow: hidden;
+      background-color: black;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particle-canvas"></canvas>
+  <script src="{{ url_for('static', filename='three.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='textData.js') }}"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
