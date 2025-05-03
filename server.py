@@ -140,6 +140,19 @@ def get_stage(count):
         return 'half_glitch'
     else:
         return 'chaos'
+        
+# 新增：給大銀幕動畫輪詢用
+start_triggered = False
 
+@app.route('/api/shouldStart')
+def should_start():
+    return jsonify({'shouldStart': start_triggered})
+
+@app.route('/trigger_start', methods=['POST'])
+def trigger_start():
+    global start_triggered
+    start_triggered = True
+    return 'Started'
+    
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, threaded=True)
