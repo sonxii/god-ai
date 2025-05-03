@@ -13,6 +13,7 @@ function init() {
 
   const loader = new THREE.FontLoader();
   loader.load('/static/fonts/NotoSansTC-Light.json', loadedFont => {
+    console.log("✅ 字型載入成功");
     font = loadedFont;
     displayText("測試粒子訊息"); // 初始測試用，可替換為 GPT 回應
   });
