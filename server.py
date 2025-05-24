@@ -8,6 +8,8 @@ openai.api_key = OPENAI_API_KEY
 
 app = Flask(__name__)
 
+history = []
+
 # 狀態控制變數
 start_triggered = False
 
@@ -22,15 +24,29 @@ def pray():
     user_message = data.get('message')
 
     if not start_triggered:
-        start_triggered = True  # ✅ 第一次祈願即觸發大銀幕開始
+        start_triggered = True
 
-    # 取得 AI 回應
+    # 拿 GPT 回應
     reply = get_ai_reply(user_message, stage="normal")
+
+    # 把對話加入歷史紀錄
+    history.append({
+        "user": user_message,
+        "reply": reply
+    })
+
     return jsonify({'reply': reply})
 
 @app.route('/api/shouldStart')
 def should_start():
     return jsonify({'shouldStart': start_triggered})
+
+@app.route('/latest')
+def latest():
+    if history:
+        return jsonify(history[-1])  # 傳出最新一筆
+    else:
+        return jsonify({"reply": "尚未有祈願"})
 
 @app.route('/display')
 def display():
