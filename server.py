@@ -47,6 +47,11 @@ def latest():
         return jsonify(history[-1])  # 傳出最新一筆
     else:
         return jsonify({"reply": "尚未有祈願"})
+        
+@app.route('/api/response_count')
+def response_count():
+    return jsonify({'response_count': len(history)})
+
 
 @app.route('/display')
 def display():
