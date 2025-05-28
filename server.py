@@ -52,6 +52,23 @@ def latest():
 def response_count():
     return jsonify({'response_count': len(history)})
 
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    global history
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if password == 'admin123':
+            history = []
+            return '<h2>History 已清空！</h2><a href="/admin">返回管理頁</a>'
+        else:
+            return '<h2>密碼錯誤！</h2><a href="/admin">返回管理頁</a>'
+    return '''
+        <h2>後台管理頁</h2>
+        <form method="post">
+            密碼: <input type="password" name="password">
+            <input type="submit" value="清空 History">
+        </form>
+    '''
 
 @app.route('/display')
 def display():
@@ -59,4 +76,3 @@ def display():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001)
-
