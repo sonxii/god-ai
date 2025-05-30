@@ -142,7 +142,14 @@ def reset():
 @app.route('/api/response_count')
 def response_count():
     return jsonify({'response_count': len(history)})
-
+    
+@app.route('/latest')
+def latest():
+    if all_replies:
+        return jsonify({'reply': all_replies[-1]})
+    else:
+        return jsonify({'reply': '目前尚無神靈回應'})
+        
 def get_stage(count):
     if count <= 7:
         return 'normal'
