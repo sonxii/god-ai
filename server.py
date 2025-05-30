@@ -38,13 +38,11 @@ def pray():
         
         all_replies.append(reply)
         history.append({'user': user_message, 'reply': reply})
-
-        # ✅ 收集這次回覆
-        all_replies.append(reply)
         notify_subscribers()  # ✅ 每次祈願完即推送更新
 
         if total_message_count >= 16 and not final_triggered:
             final_triggered = True
+            
             notify_final()
 
     return jsonify({'reply': reply, 'final_triggered': final_triggered})
