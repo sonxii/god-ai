@@ -1,16 +1,12 @@
 from flask import Flask, request, jsonify, render_template, Response
+from config import OPENAI_API_KEY, ADMIN_PASSWORD, RESET_KEY
 from openai_helper import get_ai_reply
 import openai
 import os
 import time
 from threading import Lock
 
-# ✅ 從 Render 設定的環境變數讀取 API 金鑰與密碼
-openai.api_key = os.environ.get("OPENAI_API_KEY")  # 不再從 config 匯入
-openai.organization = os.environ.get("OPENAI_ORG_ID")  # 如果你 Render 有設定就加，沒有可省略
-
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "default123")
-RESET_KEY = os.environ.get("RESET_KEY", "letmein")
+openai.api_key = OPENAI_API_KEY
 
 app = Flask(__name__)
 
@@ -161,6 +157,5 @@ def get_stage(count):
         return 'chaos'
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, threaded=True)
+    app.run(host='0.0.0.0', port=5001, threaded=True)
 
