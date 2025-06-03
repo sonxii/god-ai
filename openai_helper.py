@@ -38,10 +38,21 @@ def get_ai_reply(message, stage):
 神靈回答："""
         
     response = openai.ChatCompletion.create(
-        model=model,
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=250,
-        temperature=temperature,
-    )
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=250,
+            temperature=temperature,
+        )
+        return response.choices[0].message.content.strip()
+    
+    except openai.error.RateLimitError:
+        return "（神靈沉默不語……太多祈願導致力量枯竭）"
+    
+    except openai.error.AuthenticationError:
+        return "（神靈連線失敗，請確認 API 金鑰是否有效）"
 
-    return response.choices[0].message.content.strip()
+    except Exception as e:
+        print("🔥 GPT 回傳錯誤：", traceback.format_exc())
+        return "（神靈陷入混沌，無法回應你的願望）"
+
+
